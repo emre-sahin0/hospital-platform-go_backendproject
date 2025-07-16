@@ -1,0 +1,351 @@
+basePath: /
+definitions:
+  model.LoginRequest:
+    description: Kullanıcı giriş bilgileri
+    properties:
+      email:
+        description: E-posta adresi
+        example: ahmet.yilmaz@example.com
+        type: string
+      password:
+        description: Şifre
+        example: "123456"
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.Polyclinic:
+    description: Hastane poliklinik bilgileri
+    properties:
+      floor:
+        description: Kat numarası
+        example: 2
+        type: integer
+      name:
+        description: Poliklinik adı
+        example: Kardiyoloji
+        type: string
+      room_number:
+        description: Oda numarası
+        example: 205
+        type: integer
+    required:
+    - floor
+    - name
+    - room_number
+    type: object
+  model.ResetPasswordConfirm:
+    description: Şifre sıfırlama onayı
+    properties:
+      code:
+        description: Doğrulama kodu
+        example: "123456"
+        type: string
+      confirm_password:
+        description: Şifre tekrarı
+        example: yeni123456
+        type: string
+      new_password:
+        description: Yeni şifre
+        example: yeni123456
+        minLength: 6
+        type: string
+      phone:
+        description: Telefon numarası
+        example: "05551234567"
+        type: string
+    required:
+    - code
+    - confirm_password
+    - new_password
+    - phone
+    type: object
+  model.ResetPasswordRequest:
+    description: Şifre sıfırlama talebi
+    properties:
+      phone:
+        description: Telefon numarası
+        example: "05551234567"
+        type: string
+    required:
+    - phone
+    type: object
+  model.User:
+    description: Hastane kullanıcı bilgileri
+    properties:
+      email:
+        description: E-posta adresi
+        example: ahmet.yilmaz@example.com
+        type: string
+      first_name:
+        description: Ad
+        example: Ahmet
+        type: string
+      hospital_id:
+        description: Hangi hastaneye ait
+        example: 1
+        type: integer
+      last_name:
+        description: Soyad
+        example: Yılmaz
+        type: string
+      password:
+        description: Şifre (JSON'dan okuyabilir ama response'da göstermez)
+        example: "123456"
+        minLength: 6
+        type: string
+      phone:
+        description: Telefon numarası
+        example: "05551234567"
+        type: string
+      role:
+        description: 'Rol: "admin" veya "worker"'
+        enum:
+        - admin
+        - worker
+        example: worker
+        type: string
+      tc:
+        description: Türkiye Cumhuriyeti Kimlik Numarası
+        example: "12345678901"
+        type: string
+    required:
+    - email
+    - first_name
+    - hospital_id
+    - last_name
+    - password
+    - phone
+    - role
+    - tc
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Bu API VatanSoft staj giriş projesi için yazılmıştır.
+  title: Hastane Takip API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Email ve şifre ile kullanıcı girişi yapılır
+      parameters:
+      - description: Giriş bilgileri
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Kullanıcı girişi
+      tags:
+      - Auth
+  /polyclinics:
+    get:
+      description: Sistemdeki tüm poliklinikleri listeler.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Polyclinic'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Tüm poliklinikleri getir
+      tags:
+      - Polyclinic
+    post:
+      consumes:
+      - application/json
+      description: Yeni bir poliklinik ekler.
+      parameters:
+      - description: Poliklinik verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Polyclinic'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Yeni poliklinik oluştur
+      tags:
+      - Polyclinic
+  /polyclinics/{id}:
+    delete:
+      description: ID'ye göre poliklinik kaydını siler.
+      parameters:
+      - description: Poliklinik ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Poliklinik sil
+      tags:
+      - Polyclinic
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Poliklinik ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Yeni poliklinik verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Polyclinic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Poliklinik bilgilerini güncelle
+      tags:
+      - Polyclinic
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Yeni kullanıcıyı kaydeder
+      parameters:
+      - description: Kullanıcı bilgileri
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Yeni kullanıcı kaydı
+      tags:
+      - Auth
+  /reset-password/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Kod doğruysa yeni şifre veritabanına yazılır
+      parameters:
+      - description: Yeni şifre bilgileri
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.ResetPasswordConfirm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Kodla şifreyi sıfırla
+      tags:
+      - Auth
+  /reset-password/request:
+    post:
+      consumes:
+      - application/json
+      description: Telefon numarasına geçici şifre sıfırlama kodu üretir
+      parameters:
+      - description: Telefon numarası
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Şifre sıfırlama kodu gönder
+      tags:
+      - Auth
+swagger: "2.0"
