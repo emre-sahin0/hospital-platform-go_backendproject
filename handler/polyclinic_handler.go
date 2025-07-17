@@ -5,11 +5,12 @@ import (
 	"strconv"
 
 	"hospital-platform/model"
-	"hospital-platform/service"
+	"hospital-platform/repository"
 
 	"github.com/labstack/echo/v4"
 )
 
+// CreatePolyclinic yeni poliklinik oluşturur (legacy)
 // @Summary Yeni poliklinik oluştur
 // @Description Yeni bir poliklinik ekler.
 // @Tags Polyclinic
@@ -26,7 +27,8 @@ func CreatePolyclinic(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": "Geçersiz veri"})
 	}
 
-	if err := service.CreatePolyclinicService(&poly); err != nil {
+	// Legacy repository fonksiyonunu kullan
+	if err := repository.CreatePolyclinic(&poly); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
 	}
 
@@ -36,6 +38,7 @@ func CreatePolyclinic(c echo.Context) error {
 	})
 }
 
+// GetAllPolyclinics tüm poliklinikleri getirir (legacy)
 // @Summary Tüm poliklinikleri getir
 // @Description Sistemdeki tüm poliklinikleri listeler.
 // @Tags Polyclinic
@@ -44,13 +47,15 @@ func CreatePolyclinic(c echo.Context) error {
 // @Failure 500 {object} map[string]interface{}
 // @Router /polyclinics [get]
 func GetAllPolyclinics(c echo.Context) error {
-	data, err := service.GetAllPolyclinicsService()
+	// Legacy repository fonksiyonunu kullan
+	data, err := repository.GetAllPolyclinics()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Listeleme hatası"})
 	}
 	return c.JSON(http.StatusOK, data)
 }
 
+// DeletePolyclinic poliklinik siler (legacy)
 // @Summary Poliklinik sil
 // @Description ID'ye göre poliklinik kaydını siler.
 // @Tags Polyclinic
@@ -62,13 +67,15 @@ func GetAllPolyclinics(c echo.Context) error {
 func DeletePolyclinic(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	if err := service.DeletePolyclinicService(uint(id)); err != nil {
+	// Legacy repository fonksiyonunu kullan
+	if err := repository.DeletePolyclinic(uint(id)); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": "Silinemedi"})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"message": "Poliklinik başarıyla silindi"})
 }
 
+// UpdatePolyclinic poliklinik günceller (legacy)
 // @Summary Poliklinik bilgilerini güncelle
 // @Tags Polyclinic
 // @Accept json
@@ -84,8 +91,21 @@ func UpdatePolyclinic(c echo.Context) error {
 	if err := c.Bind(&poly); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": "Geçersiz veri"})
 	}
-	if err := service.UpdatePolyclinicService(uint(id), &poly); err != nil {
+
+	// Önce mevcut kaydı getir
+	existing, err := repository.GetPolyclinicByID(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"message": "Poliklinik bulunamadı"})
+	}
+
+	// Güncelle
+	existing.Name = poly.Name
+	existing.Floor = poly.Floor
+	existing.RoomNumber = poly.RoomNumber
+
+	if err := repository.UpdatePolyclinic(existing); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
 	}
-	return c.JSON(http.StatusOK, echo.Map{"message": "Poliklinik güncellendi", "data": poly})
+
+	return c.JSON(http.StatusOK, echo.Map{"message": "Poliklinik güncellendi", "data": existing})
 }

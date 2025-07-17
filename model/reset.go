@@ -1,12 +1,10 @@
 package model
 
-// ResetPasswordRequest represents a password reset request
 // @Description Şifre sıfırlama talebi
 type ResetPasswordRequest struct {
 	Phone string `json:"phone" example:"05551234567" binding:"required"` // Telefon numarası
 }
 
-// ResetPasswordConfirm represents password reset confirmation
 // @Description Şifre sıfırlama onayı
 type ResetPasswordConfirm struct {
 	Phone           string `json:"phone" example:"05551234567" binding:"required"`             // Telefon numarası

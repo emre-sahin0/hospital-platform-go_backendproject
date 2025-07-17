@@ -10,10 +10,15 @@ import (
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Warning: .env file not found, using system environment variables")
 	}
 }
 
-func GetEnv(key string) string {
-	return os.Getenv(key)
+// GetEnv gets environment variable with default value
+func GetEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }

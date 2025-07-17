@@ -1,5 +1,280 @@
 basePath: /
 definitions:
+  model.AddPolyclinicRequest:
+    description: Hastaneye poliklinik ekleme verisi
+    properties:
+      floor:
+        description: Kat numarası
+        example: 2
+        type: integer
+      polyclinic_type_id:
+        description: Master data'dan seçilen tür
+        example: 1
+        type: integer
+      room_number:
+        description: Oda numarası
+        example: 205
+        type: integer
+    required:
+    - floor
+    - polyclinic_type_id
+    - room_number
+    type: object
+  model.CreateStaffRequest:
+    type: object
+  model.District:
+    description: İlçe bilgileri
+    properties:
+      name:
+        description: İlçe adı
+        example: Beşiktaş
+        type: string
+      province:
+        allOf:
+        - $ref: '#/definitions/model.Province'
+        description: İl bilgisi
+      province_id:
+        description: Bağlı olduğu il
+        example: 1
+        type: integer
+    required:
+    - name
+    - province_id
+    type: object
+  model.Hospital:
+    description: Hastane bilgileri
+    properties:
+      address_detail:
+        description: Açık adres
+        example: Beşiktaş Caddesi No:123
+        type: string
+      district:
+        allOf:
+        - $ref: '#/definitions/model.District'
+        description: İlçe bilgisi
+      district_id:
+        description: İlçe ID
+        example: 1
+        type: integer
+      email:
+        description: E-posta adresi
+        example: info@acibadem.com
+        type: string
+      name:
+        description: Hastane adı
+        example: Acıbadem Hastanesi
+        type: string
+      phone:
+        description: Telefon numarası
+        example: "02121234567"
+        type: string
+      province:
+        allOf:
+        - $ref: '#/definitions/model.Province'
+        description: İlişkiler
+      province_id:
+        description: İl ID
+        example: 1
+        type: integer
+      tax_id:
+        description: Vergi kimlik numarası
+        example: "1234567890"
+        type: string
+      users:
+        description: Hastane kullanıcıları
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    required:
+    - address_detail
+    - district_id
+    - email
+    - name
+    - phone
+    - province_id
+    - tax_id
+    type: object
+  model.HospitalPolyclinic:
+    description: Hastane poliklinik bilgileri
+    properties:
+      floor:
+        description: Kat numarası
+        example: 2
+        type: integer
+      hospital:
+        allOf:
+        - $ref: '#/definitions/model.Hospital'
+        description: İlişkiler
+      hospital_id:
+        description: Hangi hastane
+        example: 1
+        type: integer
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
+      polyclinic_type:
+        $ref: '#/definitions/model.PolyclinicType'
+      polyclinic_type_id:
+        description: Poliklinik türü
+        example: 1
+        type: integer
+      room_number:
+        description: Oda numarası
+        example: 205
+        type: integer
+      staff:
+        description: Bu poliklinikte çalışan personel
+        items:
+          $ref: '#/definitions/model.Staff'
+        type: array
+    required:
+    - floor
+    - hospital_id
+    - polyclinic_type_id
+    - room_number
+    type: object
+  model.HospitalPolyclinicSummary:
+    description: Hastane poliklinik özet bilgileri
+    properties:
+      floor:
+        example: 2
+        type: integer
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      polyclinic_type_name:
+        example: Kardiyoloji
+        type: string
+      room_number:
+        example: 205
+        type: integer
+      staff_by_job_group:
+        description: Meslek grubuna göre personel sayıları
+        items:
+          $ref: '#/definitions/model.StaffCountByGroup'
+        type: array
+      total_staff_count:
+        description: Toplam personel sayısı
+        example: 10
+        type: integer
+    type: object
+  model.HospitalRegistrationRequest:
+    description: Hastane kayıt verisi
+    properties:
+      address_detail:
+        example: Beşiktaş Caddesi No:123
+        type: string
+      admin_email:
+        example: ahmet.yilmaz@acibadem.com
+        type: string
+      admin_first_name:
+        description: Yetkili Bilgileri
+        example: Ahmet
+        type: string
+      admin_last_name:
+        example: Yılmaz
+        type: string
+      admin_password:
+        example: "123456"
+        minLength: 6
+        type: string
+      admin_phone:
+        example: "05551234567"
+        type: string
+      admin_tc:
+        example: "12345678901"
+        type: string
+      district_id:
+        example: 1
+        type: integer
+      hospital_email:
+        example: info@acibadem.com
+        type: string
+      hospital_name:
+        description: Hastane Bilgileri
+        example: Acıbadem Hastanesi
+        type: string
+      hospital_phone:
+        example: "02121234567"
+        type: string
+      province_id:
+        description: Adres Bilgileri
+        example: 1
+        type: integer
+      tax_id:
+        example: "1234567890"
+        type: string
+    required:
+    - address_detail
+    - admin_email
+    - admin_first_name
+    - admin_last_name
+    - admin_password
+    - admin_phone
+    - admin_tc
+    - district_id
+    - hospital_email
+    - hospital_name
+    - hospital_phone
+    - province_id
+    - tax_id
+    type: object
+  model.HospitalRegistrationResponse:
+    description: Hastane kayıt yanıtı
+    properties:
+      admin_user:
+        $ref: '#/definitions/model.User'
+      hospital:
+        $ref: '#/definitions/model.Hospital'
+      message:
+        example: Hastane başarıyla kaydedildi
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  model.JobGroup:
+    description: Meslek grubu bilgileri
+    properties:
+      job_titles:
+        description: Bu gruba ait unvanlar
+        items:
+          $ref: '#/definitions/model.JobTitle'
+        type: array
+      name:
+        description: Meslek grubu adı
+        example: Doktor
+        type: string
+    required:
+    - name
+    type: object
+  model.JobTitle:
+    description: Unvan bilgileri
+    properties:
+      is_unique:
+        description: 'Bu unvandan hastanede sadece 1 tane olabilir mi? (örn: Başhekim)'
+        example: false
+        type: boolean
+      job_group:
+        allOf:
+        - $ref: '#/definitions/model.JobGroup'
+        description: Meslek grubu bilgisi
+      job_group_id:
+        description: Bağlı olduğu meslek grubu
+        example: 1
+        type: integer
+      name:
+        description: Unvan adı
+        example: Uzman Doktor
+        type: string
+    required:
+    - job_group_id
+    - name
+    type: object
   model.LoginRequest:
     description: Kullanıcı giriş bilgileri
     properties:
@@ -16,8 +291,36 @@ definitions:
     - email
     - password
     type: object
+  model.PaginationInfo:
+    description: Sayfalama bilgileri
+    properties:
+      current_page:
+        description: Mevcut sayfa
+        example: 1
+        type: integer
+      has_next:
+        description: Sonraki sayfa var mı?
+        example: true
+        type: boolean
+      has_prev:
+        description: Önceki sayfa var mı?
+        example: false
+        type: boolean
+      page_size:
+        description: Sayfa başına kayıt
+        example: 10
+        type: integer
+      total_pages:
+        description: Toplam sayfa sayısı
+        example: 5
+        type: integer
+      total_records:
+        description: Toplam kayıt sayısı
+        example: 45
+        type: integer
+    type: object
   model.Polyclinic:
-    description: Hastane poliklinik bilgileri
+    description: Hastane poliklinik bilgileri (eski model)
     properties:
       floor:
         description: Kat numarası
@@ -35,6 +338,35 @@ definitions:
     - floor
     - name
     - room_number
+    type: object
+  model.PolyclinicType:
+    description: Poliklinik türü bilgileri (master data)
+    properties:
+      description:
+        description: Açıklama
+        example: Kalp ve damar hastalıkları
+        type: string
+      name:
+        description: Poliklinik türü adı
+        example: Kardiyoloji
+        type: string
+    required:
+    - name
+    type: object
+  model.Province:
+    description: İl bilgileri
+    properties:
+      districts:
+        description: İlçeler
+        items:
+          $ref: '#/definitions/model.District'
+        type: array
+      name:
+        description: İl adı
+        example: İstanbul
+        type: string
+    required:
+    - name
     type: object
   model.ResetPasswordConfirm:
     description: Şifre sıfırlama onayı
@@ -72,9 +404,212 @@ definitions:
     required:
     - phone
     type: object
+  model.Staff:
+    description: Hastane personel bilgileri
+    properties:
+      first_name:
+        description: Ad
+        example: Dr. Mehmet
+        type: string
+      hospital:
+        allOf:
+        - $ref: '#/definitions/model.Hospital'
+        description: İlişkiler
+      hospital_id:
+        description: Hangi hastane
+        example: 1
+        type: integer
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
+      job_group:
+        $ref: '#/definitions/model.JobGroup'
+      job_group_id:
+        description: Meslek grubu
+        example: 1
+        type: integer
+      job_title:
+        $ref: '#/definitions/model.JobTitle'
+      job_title_id:
+        description: Unvan
+        example: 1
+        type: integer
+      last_name:
+        description: Soyad
+        example: Özkan
+        type: string
+      phone:
+        description: Telefon
+        example: "05559876543"
+        type: string
+      polyclinic:
+        $ref: '#/definitions/model.HospitalPolyclinic'
+      polyclinic_id:
+        description: Bağlı olduğu poliklinik (nullable - güvenlik gibi genel personel
+          için)
+        example: 1
+        type: integer
+      tc:
+        description: TC Kimlik No
+        example: "98765432101"
+        type: string
+      work_days:
+        description: 'Çalışma günleri (JSON array: 1=Pazartesi, 7=Pazar)'
+        example: '[1,2,3,4,5]'
+        type: string
+    required:
+    - first_name
+    - hospital_id
+    - job_group_id
+    - job_title_id
+    - last_name
+    - phone
+    - tc
+    - work_days
+    type: object
+  model.StaffCountByGroup:
+    description: Meslek grubuna göre personel sayısı
+    properties:
+      count:
+        example: 7
+        type: integer
+      job_group_name:
+        example: Doktor
+        type: string
+    type: object
+  model.StaffListRequest:
+    description: Personel listeleme ve filtreleme verisi
+    properties:
+      first_name:
+        description: Filtering (Optional)
+        example: Mehmet
+        type: string
+      is_active:
+        description: Aktiflik durumu ile filtreleme
+        example: true
+        type: boolean
+      job_group_id:
+        description: Meslek grubu ile filtreleme
+        example: 1
+        type: integer
+      job_title_id:
+        description: Unvan ile filtreleme
+        example: 2
+        type: integer
+      last_name:
+        description: Soyad ile filtreleme
+        example: Özkan
+        type: string
+      page:
+        description: Pagination
+        example: 1
+        minimum: 1
+        type: integer
+      page_size:
+        description: Sayfa başına kayıt (1-100 arası)
+        example: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+      polyclinic_id:
+        description: Poliklinik ile filtreleme
+        example: 1
+        type: integer
+      tc:
+        description: TC ile filtreleme
+        example: "98765432101"
+        type: string
+    type: object
+  model.StaffListResponse:
+    description: Sayfalandırılmış personel listesi yanıtı
+    properties:
+      data:
+        description: Personel listesi
+        items:
+          $ref: '#/definitions/model.StaffSummary'
+        type: array
+      pagination:
+        allOf:
+        - $ref: '#/definitions/model.PaginationInfo'
+        description: Sayfalama bilgileri
+    type: object
+  model.StaffSummary:
+    description: Personel özet bilgileri
+    properties:
+      first_name:
+        description: Ad
+        example: Dr. Mehmet
+        type: string
+      id:
+        description: Personel ID
+        example: 1
+        type: integer
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
+      job_group_name:
+        description: Meslek grubu adı
+        example: Doktor
+        type: string
+      job_title_name:
+        description: Unvan adı
+        example: Uzman Doktor
+        type: string
+      last_name:
+        description: Soyad
+        example: Özkan
+        type: string
+      phone:
+        description: Telefon
+        example: "05559876543"
+        type: string
+      polyclinic_type_name:
+        description: Poliklinik adı (nullable)
+        example: Kardiyoloji
+        type: string
+      tc:
+        description: TC Kimlik No
+        example: "98765432101"
+        type: string
+      work_days_text:
+        description: Çalışma günleri metni
+        example: Pazartesi-Cuma
+        type: string
+    type: object
+  model.UpdatePolyclinicRequest:
+    description: Hastane poliklinik güncelleme verisi
+    properties:
+      floor:
+        description: Kat numarası
+        example: 3
+        type: integer
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
+      room_number:
+        description: Oda numarası
+        example: 301
+        type: integer
+    required:
+    - floor
+    - room_number
+    type: object
+  model.UpdateStaffRequest:
+    type: object
   model.User:
     description: Hastane kullanıcı bilgileri
     properties:
+      created_by:
+        description: Kim tarafından eklendi (nullable - ilk user için)
+        example: 1
+        type: integer
+      creator:
+        allOf:
+        - $ref: '#/definitions/model.User'
+        description: Oluşturan kullanıcı
       email:
         description: E-posta adresi
         example: ahmet.yilmaz@example.com
@@ -83,10 +618,18 @@ definitions:
         description: Ad
         example: Ahmet
         type: string
+      hospital:
+        allOf:
+        - $ref: '#/definitions/model.Hospital'
+        description: İlişkiler
       hospital_id:
         description: Hangi hastaneye ait
         example: 1
         type: integer
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
       last_name:
         description: Soyad
         example: Yılmaz
@@ -101,11 +644,11 @@ definitions:
         example: "05551234567"
         type: string
       role:
-        description: 'Rol: "admin" veya "worker"'
+        description: 'Rol: "yetkili" veya "çalışan"'
         enum:
-        - admin
-        - worker
-        example: worker
+        - yetkili
+        - çalışan
+        example: çalışan
         type: string
       tc:
         description: Türkiye Cumhuriyeti Kimlik Numarası
@@ -128,6 +671,431 @@ info:
   title: Hastane Takip API
   version: "1.0"
 paths:
+  /hospital/{id}:
+    get:
+      description: ID'ye göre hastane bilgilerini getirir
+      parameters:
+      - description: Hastane ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Hospital'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Hastane bilgilerini getir
+      tags:
+      - Hospital
+  /hospital/polyclinics:
+    get:
+      description: Hastaneye ait poliklinikleri personel sayılarıyla listeler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.HospitalPolyclinicSummary'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hastane polikliniklerini getir
+      tags:
+      - Polyclinic
+    post:
+      consumes:
+      - application/json
+      description: Seçilen poliklinik türünü hastaneye ekler
+      parameters:
+      - description: Poliklinik ekleme verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddPolyclinicRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.HospitalPolyclinic'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hastaneye poliklinik ekle
+      tags:
+      - Polyclinic
+  /hospital/polyclinics/{id}:
+    delete:
+      description: Hastane poliklinik siler
+      parameters:
+      - description: Poliklinik ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hastane poliklinik sil
+      tags:
+      - Polyclinic
+    put:
+      consumes:
+      - application/json
+      description: Hastane poliklinik bilgilerini günceller
+      parameters:
+      - description: Poliklinik ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Güncelleme verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdatePolyclinicRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.HospitalPolyclinic'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hastane poliklinik güncelle
+      tags:
+      - Polyclinic
+  /hospital/register:
+    post:
+      consumes:
+      - application/json
+      description: Yeni hastane ve admin kullanıcı kaydı yapar
+      parameters:
+      - description: Hastane kayıt verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.HospitalRegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.HospitalRegistrationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Hastane kaydı
+      tags:
+      - Hospital
+  /hospital/staff:
+    post:
+      consumes:
+      - application/json
+      description: Hastaneye yeni personel ekler
+      parameters:
+      - description: Personel ekleme verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateStaffRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Staff'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Personel ekle
+      tags:
+      - Staff
+  /hospital/staff/{id}:
+    delete:
+      description: Personeli siler
+      parameters:
+      - description: Personel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Personel sil
+      tags:
+      - Staff
+    get:
+      description: ID'ye göre personel detaylarını getirir
+      parameters:
+      - description: Personel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Staff'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Personel detayları
+      tags:
+      - Staff
+    put:
+      consumes:
+      - application/json
+      description: Personel bilgilerini günceller
+      parameters:
+      - description: Personel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Güncelleme verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateStaffRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Staff'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Personel güncelle
+      tags:
+      - Staff
+  /hospital/staff/list:
+    post:
+      consumes:
+      - application/json
+      description: Hastane personellerini sayfalandırılmış ve filtreli olarak getirir
+      parameters:
+      - description: Listeleme ve filtreleme verisi
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.StaffListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StaffListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Personel listesi
+      tags:
+      - Staff
+  /job-groups:
+    get:
+      description: Tüm meslek gruplarını getirir
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.JobGroup'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Meslek grupları
+      tags:
+      - Staff
+  /job-groups/{job_group_id}/titles:
+    get:
+      description: Seçilen meslek grubuna ait unvanları getirir
+      parameters:
+      - description: Meslek grubu ID
+        in: path
+        name: job_group_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.JobTitle'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Meslek grubuna göre unvanlar
+      tags:
+      - Staff
   /login:
     post:
       consumes:
@@ -156,6 +1124,26 @@ paths:
       summary: Kullanıcı girişi
       tags:
       - Auth
+  /polyclinic-types:
+    get:
+      description: Master data'dan poliklinik türlerini getirir (dropdown için)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.PolyclinicType'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Poliklinik türleri listesi
+      tags:
+      - Polyclinic
   /polyclinics:
     get:
       description: Sistemdeki tüm poliklinikleri listeler.
@@ -259,6 +1247,57 @@ paths:
       summary: Poliklinik bilgilerini güncelle
       tags:
       - Polyclinic
+  /provinces:
+    get:
+      description: Dropdown için tüm illeri listeler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Province'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Tüm illeri getir
+      tags:
+      - Location
+  /provinces/{province_id}/districts:
+    get:
+      description: Seçilen ile ait ilçeleri listeler
+      parameters:
+      - description: İl ID
+        in: path
+        name: province_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.District'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: İle göre ilçeleri getir
+      tags:
+      - Location
   /register:
     post:
       consumes:

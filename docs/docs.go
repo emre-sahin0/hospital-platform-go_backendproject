@@ -15,6 +15,653 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/hospital/polyclinics": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastaneye ait poliklinikleri personel sayılarıyla listeler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polyclinic"
+                ],
+                "summary": "Hastane polikliniklerini getir",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.HospitalPolyclinicSummary"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Seçilen poliklinik türünü hastaneye ekler",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polyclinic"
+                ],
+                "summary": "Hastaneye poliklinik ekle",
+                "parameters": [
+                    {
+                        "description": "Poliklinik ekleme verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AddPolyclinicRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.HospitalPolyclinic"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/polyclinics/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastane poliklinik bilgilerini günceller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polyclinic"
+                ],
+                "summary": "Hastane poliklinik güncelle",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Poliklinik ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Güncelleme verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdatePolyclinicRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.HospitalPolyclinic"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastane poliklinik siler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polyclinic"
+                ],
+                "summary": "Hastane poliklinik sil",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Poliklinik ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/register": {
+            "post": {
+                "description": "Yeni hastane ve admin kullanıcı kaydı yapar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hospital"
+                ],
+                "summary": "Hastane kaydı",
+                "parameters": [
+                    {
+                        "description": "Hastane kayıt verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.HospitalRegistrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.HospitalRegistrationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/staff": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastaneye yeni personel ekler",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Personel ekle",
+                "parameters": [
+                    {
+                        "description": "Personel ekleme verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Staff"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/staff/list": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastane personellerini sayfalandırılmış ve filtreli olarak getirir",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Personel listesi",
+                "parameters": [
+                    {
+                        "description": "Listeleme ve filtreleme verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.StaffListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.StaffListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/staff/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ID'ye göre personel detaylarını getirir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Personel detayları",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Personel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Staff"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Personel bilgilerini günceller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Personel güncelle",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Personel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Güncelleme verisi",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateStaffRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Staff"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Personeli siler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Personel sil",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Personel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/{id}": {
+            "get": {
+                "description": "ID'ye göre hastane bilgilerini getirir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hospital"
+                ],
+                "summary": "Hastane bilgilerini getir",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Hastane ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Hospital"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/job-groups": {
+            "get": {
+                "description": "Tüm meslek gruplarını getirir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Meslek grupları",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.JobGroup"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/job-groups/{job_group_id}/titles": {
+            "get": {
+                "description": "Seçilen meslek grubuna ait unvanları getirir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Staff"
+                ],
+                "summary": "Meslek grubuna göre unvanlar",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Meslek grubu ID",
+                        "name": "job_group_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.JobTitle"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Email ve şifre ile kullanıcı girişi yapılır",
@@ -49,6 +696,36 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/polyclinic-types": {
+            "get": {
+                "description": "Master data'dan poliklinik türlerini getirir (dropdown için)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polyclinic"
+                ],
+                "summary": "Poliklinik türleri listesi",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.PolyclinicType"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -210,6 +887,82 @@ const docTemplate = `{
                 }
             }
         },
+        "/provinces": {
+            "get": {
+                "description": "Dropdown için tüm illeri listeler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Tüm illeri getir",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Province"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/provinces/{province_id}/districts": {
+            "get": {
+                "description": "Seçilen ile ait ilçeleri listeler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Location"
+                ],
+                "summary": "İle göre ilçeleri getir",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "İl ID",
+                        "name": "province_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.District"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "description": "Yeni kullanıcıyı kaydeder",
@@ -345,6 +1098,380 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.AddPolyclinicRequest": {
+            "description": "Hastaneye poliklinik ekleme verisi",
+            "type": "object",
+            "required": [
+                "floor",
+                "polyclinic_type_id",
+                "room_number"
+            ],
+            "properties": {
+                "floor": {
+                    "description": "Kat numarası",
+                    "type": "integer",
+                    "example": 2
+                },
+                "polyclinic_type_id": {
+                    "description": "Master data'dan seçilen tür",
+                    "type": "integer",
+                    "example": 1
+                },
+                "room_number": {
+                    "description": "Oda numarası",
+                    "type": "integer",
+                    "example": 205
+                }
+            }
+        },
+        "model.CreateStaffRequest": {
+            "type": "object"
+        },
+        "model.District": {
+            "description": "İlçe bilgileri",
+            "type": "object",
+            "required": [
+                "name",
+                "province_id"
+            ],
+            "properties": {
+                "name": {
+                    "description": "İlçe adı",
+                    "type": "string",
+                    "example": "Beşiktaş"
+                },
+                "province": {
+                    "description": "İl bilgisi",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Province"
+                        }
+                    ]
+                },
+                "province_id": {
+                    "description": "Bağlı olduğu il",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.Hospital": {
+            "description": "Hastane bilgileri",
+            "type": "object",
+            "required": [
+                "address_detail",
+                "district_id",
+                "email",
+                "name",
+                "phone",
+                "province_id",
+                "tax_id"
+            ],
+            "properties": {
+                "address_detail": {
+                    "description": "Açık adres",
+                    "type": "string",
+                    "example": "Beşiktaş Caddesi No:123"
+                },
+                "district": {
+                    "description": "İlçe bilgisi",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.District"
+                        }
+                    ]
+                },
+                "district_id": {
+                    "description": "İlçe ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "email": {
+                    "description": "E-posta adresi",
+                    "type": "string",
+                    "example": "info@acibadem.com"
+                },
+                "name": {
+                    "description": "Hastane adı",
+                    "type": "string",
+                    "example": "Acıbadem Hastanesi"
+                },
+                "phone": {
+                    "description": "Telefon numarası",
+                    "type": "string",
+                    "example": "02121234567"
+                },
+                "province": {
+                    "description": "İlişkiler",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Province"
+                        }
+                    ]
+                },
+                "province_id": {
+                    "description": "İl ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "tax_id": {
+                    "description": "Vergi kimlik numarası",
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "users": {
+                    "description": "Hastane kullanıcıları",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.User"
+                    }
+                }
+            }
+        },
+        "model.HospitalPolyclinic": {
+            "description": "Hastane poliklinik bilgileri",
+            "type": "object",
+            "required": [
+                "floor",
+                "hospital_id",
+                "polyclinic_type_id",
+                "room_number"
+            ],
+            "properties": {
+                "floor": {
+                    "description": "Kat numarası",
+                    "type": "integer",
+                    "example": 2
+                },
+                "hospital": {
+                    "description": "İlişkiler",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Hospital"
+                        }
+                    ]
+                },
+                "hospital_id": {
+                    "description": "Hangi hastane",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "polyclinic_type": {
+                    "$ref": "#/definitions/model.PolyclinicType"
+                },
+                "polyclinic_type_id": {
+                    "description": "Poliklinik türü",
+                    "type": "integer",
+                    "example": 1
+                },
+                "room_number": {
+                    "description": "Oda numarası",
+                    "type": "integer",
+                    "example": 205
+                },
+                "staff": {
+                    "description": "Bu poliklinikte çalışan personel",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Staff"
+                    }
+                }
+            }
+        },
+        "model.HospitalPolyclinicSummary": {
+            "description": "Hastane poliklinik özet bilgileri",
+            "type": "object",
+            "properties": {
+                "floor": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "polyclinic_type_name": {
+                    "type": "string",
+                    "example": "Kardiyoloji"
+                },
+                "room_number": {
+                    "type": "integer",
+                    "example": 205
+                },
+                "staff_by_job_group": {
+                    "description": "Meslek grubuna göre personel sayıları",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.StaffCountByGroup"
+                    }
+                },
+                "total_staff_count": {
+                    "description": "Toplam personel sayısı",
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "model.HospitalRegistrationRequest": {
+            "description": "Hastane kayıt verisi",
+            "type": "object",
+            "required": [
+                "address_detail",
+                "admin_email",
+                "admin_first_name",
+                "admin_last_name",
+                "admin_password",
+                "admin_phone",
+                "admin_tc",
+                "district_id",
+                "hospital_email",
+                "hospital_name",
+                "hospital_phone",
+                "province_id",
+                "tax_id"
+            ],
+            "properties": {
+                "address_detail": {
+                    "type": "string",
+                    "example": "Beşiktaş Caddesi No:123"
+                },
+                "admin_email": {
+                    "type": "string",
+                    "example": "ahmet.yilmaz@acibadem.com"
+                },
+                "admin_first_name": {
+                    "description": "Yetkili Bilgileri",
+                    "type": "string",
+                    "example": "Ahmet"
+                },
+                "admin_last_name": {
+                    "type": "string",
+                    "example": "Yılmaz"
+                },
+                "admin_password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "example": "123456"
+                },
+                "admin_phone": {
+                    "type": "string",
+                    "example": "05551234567"
+                },
+                "admin_tc": {
+                    "type": "string",
+                    "example": "12345678901"
+                },
+                "district_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "hospital_email": {
+                    "type": "string",
+                    "example": "info@acibadem.com"
+                },
+                "hospital_name": {
+                    "description": "Hastane Bilgileri",
+                    "type": "string",
+                    "example": "Acıbadem Hastanesi"
+                },
+                "hospital_phone": {
+                    "type": "string",
+                    "example": "02121234567"
+                },
+                "province_id": {
+                    "description": "Adres Bilgileri",
+                    "type": "integer",
+                    "example": 1
+                },
+                "tax_id": {
+                    "type": "string",
+                    "example": "1234567890"
+                }
+            }
+        },
+        "model.HospitalRegistrationResponse": {
+            "description": "Hastane kayıt yanıtı",
+            "type": "object",
+            "properties": {
+                "admin_user": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "hospital": {
+                    "$ref": "#/definitions/model.Hospital"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Hastane başarıyla kaydedildi"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "model.JobGroup": {
+            "description": "Meslek grubu bilgileri",
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "job_titles": {
+                    "description": "Bu gruba ait unvanlar",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.JobTitle"
+                    }
+                },
+                "name": {
+                    "description": "Meslek grubu adı",
+                    "type": "string",
+                    "example": "Doktor"
+                }
+            }
+        },
+        "model.JobTitle": {
+            "description": "Unvan bilgileri",
+            "type": "object",
+            "required": [
+                "job_group_id",
+                "name"
+            ],
+            "properties": {
+                "is_unique": {
+                    "description": "Bu unvandan hastanede sadece 1 tane olabilir mi? (örn: Başhekim)",
+                    "type": "boolean",
+                    "example": false
+                },
+                "job_group": {
+                    "description": "Meslek grubu bilgisi",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.JobGroup"
+                        }
+                    ]
+                },
+                "job_group_id": {
+                    "description": "Bağlı olduğu meslek grubu",
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "description": "Unvan adı",
+                    "type": "string",
+                    "example": "Uzman Doktor"
+                }
+            }
+        },
         "model.LoginRequest": {
             "description": "Kullanıcı giriş bilgileri",
             "type": "object",
@@ -366,8 +1493,44 @@ const docTemplate = `{
                 }
             }
         },
+        "model.PaginationInfo": {
+            "description": "Sayfalama bilgileri",
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "description": "Mevcut sayfa",
+                    "type": "integer",
+                    "example": 1
+                },
+                "has_next": {
+                    "description": "Sonraki sayfa var mı?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "has_prev": {
+                    "description": "Önceki sayfa var mı?",
+                    "type": "boolean",
+                    "example": false
+                },
+                "page_size": {
+                    "description": "Sayfa başına kayıt",
+                    "type": "integer",
+                    "example": 10
+                },
+                "total_pages": {
+                    "description": "Toplam sayfa sayısı",
+                    "type": "integer",
+                    "example": 5
+                },
+                "total_records": {
+                    "description": "Toplam kayıt sayısı",
+                    "type": "integer",
+                    "example": 45
+                }
+            }
+        },
         "model.Polyclinic": {
-            "description": "Hastane poliklinik bilgileri",
+            "description": "Hastane poliklinik bilgileri (eski model)",
             "type": "object",
             "required": [
                 "floor",
@@ -389,6 +1552,46 @@ const docTemplate = `{
                     "description": "Oda numarası",
                     "type": "integer",
                     "example": 205
+                }
+            }
+        },
+        "model.PolyclinicType": {
+            "description": "Poliklinik türü bilgileri (master data)",
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "description": "Açıklama",
+                    "type": "string",
+                    "example": "Kalp ve damar hastalıkları"
+                },
+                "name": {
+                    "description": "Poliklinik türü adı",
+                    "type": "string",
+                    "example": "Kardiyoloji"
+                }
+            }
+        },
+        "model.Province": {
+            "description": "İl bilgileri",
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "districts": {
+                    "description": "İlçeler",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.District"
+                    }
+                },
+                "name": {
+                    "description": "İl adı",
+                    "type": "string",
+                    "example": "İstanbul"
                 }
             }
         },
@@ -439,6 +1642,262 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Staff": {
+            "description": "Hastane personel bilgileri",
+            "type": "object",
+            "required": [
+                "first_name",
+                "hospital_id",
+                "job_group_id",
+                "job_title_id",
+                "last_name",
+                "phone",
+                "tc",
+                "work_days"
+            ],
+            "properties": {
+                "first_name": {
+                    "description": "Ad",
+                    "type": "string",
+                    "example": "Dr. Mehmet"
+                },
+                "hospital": {
+                    "description": "İlişkiler",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Hospital"
+                        }
+                    ]
+                },
+                "hospital_id": {
+                    "description": "Hangi hastane",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "job_group": {
+                    "$ref": "#/definitions/model.JobGroup"
+                },
+                "job_group_id": {
+                    "description": "Meslek grubu",
+                    "type": "integer",
+                    "example": 1
+                },
+                "job_title": {
+                    "$ref": "#/definitions/model.JobTitle"
+                },
+                "job_title_id": {
+                    "description": "Unvan",
+                    "type": "integer",
+                    "example": 1
+                },
+                "last_name": {
+                    "description": "Soyad",
+                    "type": "string",
+                    "example": "Özkan"
+                },
+                "phone": {
+                    "description": "Telefon",
+                    "type": "string",
+                    "example": "05559876543"
+                },
+                "polyclinic": {
+                    "$ref": "#/definitions/model.HospitalPolyclinic"
+                },
+                "polyclinic_id": {
+                    "description": "Bağlı olduğu poliklinik (nullable - güvenlik gibi genel personel için)",
+                    "type": "integer",
+                    "example": 1
+                },
+                "tc": {
+                    "description": "TC Kimlik No",
+                    "type": "string",
+                    "example": "98765432101"
+                },
+                "work_days": {
+                    "description": "Çalışma günleri (JSON array: 1=Pazartesi, 7=Pazar)",
+                    "type": "string",
+                    "example": "[1,2,3,4,5]"
+                }
+            }
+        },
+        "model.StaffCountByGroup": {
+            "description": "Meslek grubuna göre personel sayısı",
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 7
+                },
+                "job_group_name": {
+                    "type": "string",
+                    "example": "Doktor"
+                }
+            }
+        },
+        "model.StaffListRequest": {
+            "description": "Personel listeleme ve filtreleme verisi",
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "description": "Filtering (Optional)",
+                    "type": "string",
+                    "example": "Mehmet"
+                },
+                "is_active": {
+                    "description": "Aktiflik durumu ile filtreleme",
+                    "type": "boolean",
+                    "example": true
+                },
+                "job_group_id": {
+                    "description": "Meslek grubu ile filtreleme",
+                    "type": "integer",
+                    "example": 1
+                },
+                "job_title_id": {
+                    "description": "Unvan ile filtreleme",
+                    "type": "integer",
+                    "example": 2
+                },
+                "last_name": {
+                    "description": "Soyad ile filtreleme",
+                    "type": "string",
+                    "example": "Özkan"
+                },
+                "page": {
+                    "description": "Pagination",
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1
+                },
+                "page_size": {
+                    "description": "Sayfa başına kayıt (1-100 arası)",
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1,
+                    "example": 10
+                },
+                "polyclinic_id": {
+                    "description": "Poliklinik ile filtreleme",
+                    "type": "integer",
+                    "example": 1
+                },
+                "tc": {
+                    "description": "TC ile filtreleme",
+                    "type": "string",
+                    "example": "98765432101"
+                }
+            }
+        },
+        "model.StaffListResponse": {
+            "description": "Sayfalandırılmış personel listesi yanıtı",
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Personel listesi",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.StaffSummary"
+                    }
+                },
+                "pagination": {
+                    "description": "Sayfalama bilgileri",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.PaginationInfo"
+                        }
+                    ]
+                }
+            }
+        },
+        "model.StaffSummary": {
+            "description": "Personel özet bilgileri",
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "description": "Ad",
+                    "type": "string",
+                    "example": "Dr. Mehmet"
+                },
+                "id": {
+                    "description": "Personel ID",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "job_group_name": {
+                    "description": "Meslek grubu adı",
+                    "type": "string",
+                    "example": "Doktor"
+                },
+                "job_title_name": {
+                    "description": "Unvan adı",
+                    "type": "string",
+                    "example": "Uzman Doktor"
+                },
+                "last_name": {
+                    "description": "Soyad",
+                    "type": "string",
+                    "example": "Özkan"
+                },
+                "phone": {
+                    "description": "Telefon",
+                    "type": "string",
+                    "example": "05559876543"
+                },
+                "polyclinic_type_name": {
+                    "description": "Poliklinik adı (nullable)",
+                    "type": "string",
+                    "example": "Kardiyoloji"
+                },
+                "tc": {
+                    "description": "TC Kimlik No",
+                    "type": "string",
+                    "example": "98765432101"
+                },
+                "work_days_text": {
+                    "description": "Çalışma günleri metni",
+                    "type": "string",
+                    "example": "Pazartesi-Cuma"
+                }
+            }
+        },
+        "model.UpdatePolyclinicRequest": {
+            "description": "Hastane poliklinik güncelleme verisi",
+            "type": "object",
+            "required": [
+                "floor",
+                "room_number"
+            ],
+            "properties": {
+                "floor": {
+                    "description": "Kat numarası",
+                    "type": "integer",
+                    "example": 3
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "room_number": {
+                    "description": "Oda numarası",
+                    "type": "integer",
+                    "example": 301
+                }
+            }
+        },
+        "model.UpdateStaffRequest": {
+            "type": "object"
+        },
         "model.User": {
             "description": "Hastane kullanıcı bilgileri",
             "type": "object",
@@ -453,6 +1912,19 @@ const docTemplate = `{
                 "tc"
             ],
             "properties": {
+                "created_by": {
+                    "description": "Kim tarafından eklendi (nullable - ilk user için)",
+                    "type": "integer",
+                    "example": 1
+                },
+                "creator": {
+                    "description": "Oluşturan kullanıcı",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    ]
+                },
                 "email": {
                     "description": "E-posta adresi",
                     "type": "string",
@@ -463,10 +1935,23 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Ahmet"
                 },
+                "hospital": {
+                    "description": "İlişkiler",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.Hospital"
+                        }
+                    ]
+                },
                 "hospital_id": {
                     "description": "Hangi hastaneye ait",
                     "type": "integer",
                     "example": 1
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
                 },
                 "last_name": {
                     "description": "Soyad",
@@ -485,13 +1970,13 @@ const docTemplate = `{
                     "example": "05551234567"
                 },
                 "role": {
-                    "description": "Rol: \"admin\" veya \"worker\"",
+                    "description": "Rol: \"yetkili\" veya \"çalışan\"",
                     "type": "string",
                     "enum": [
-                        "admin",
-                        "worker"
+                        "yetkili",
+                        "çalışan"
                     ],
-                    "example": "worker"
+                    "example": "çalışan"
                 },
                 "tc": {
                     "description": "Türkiye Cumhuriyeti Kimlik Numarası",

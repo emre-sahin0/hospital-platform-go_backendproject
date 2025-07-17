@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"hospital-platform/model"
-	"hospital-platform/service" // ✅ doğru import
+	"hospital-platform/service"
 
 	"github.com/labstack/echo/v4"
 )

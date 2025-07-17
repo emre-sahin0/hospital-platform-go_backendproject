@@ -34,7 +34,7 @@ func ResetPasswordRequestHandler(c echo.Context) error {
 	}
 
 	// Kullanıcı veritabanında var mı?
-	user, err := repository.GetUserByPhone(request.Phone)
+	user, err := repository.NewUserRepository().GetByPhone(request.Phone)
 	if err != nil {
 		fmt.Println("Kullanıcı sorgusu hatası:", err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Sunucu hatası"})

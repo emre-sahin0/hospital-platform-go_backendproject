@@ -7,6 +7,7 @@ import (
 	"hospital-platform/model"
 	"hospital-platform/repository"
 	"hospital-platform/utils"
+	"strconv"
 )
 
 // Kayıt servisi — user şifresi hashlenir, veritabanına gönderilir
@@ -25,7 +26,7 @@ func RegisterUser(user *model.User) error {
 	user.Password = hashedPassword
 
 	// Veritabanına kaydet
-	err = repository.CreateUser(user)
+	err = repository.NewUserRepository().Create(user)
 	if err != nil {
 		fmt.Println("Veritabanı kayıt hatası:", err)
 	} else {
@@ -61,7 +62,7 @@ func Login(email, password string) (string, error) {
 	}
 
 	// JWT token üret
-	token, err := utils.GenerateJWT(user.ID, user.Role)
+	token, err := utils.GenerateJWT(user.ID, user.Role, strconv.FormatUint(uint64(user.HospitalID), 10))
 	if err != nil {
 		fmt.Println("Token üretme hatası:", err)
 		return "", err
