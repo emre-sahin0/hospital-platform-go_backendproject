@@ -1,6 +1,6 @@
 // @title Hastane Takip API
 // @version 1.0
-// @description Bu API VatanSoft staj giriş projesi için yazılmıştır.
+// @description Bu API VatanSoft staj projesi için yazılmıştır.
 // @host localhost:8080
 // @BasePath /
 
@@ -10,16 +10,28 @@ import (
 	"hospital-platform/config"
 	"hospital-platform/database"
 	"hospital-platform/handler"
+	"hospital-platform/utils" // Middleware'ler için
 
-	_ "hospital-platform/docs"
+	_ "hospital-platform/docs" // Swagger docs
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-func main() {
+// CustomValidator struct for Echo validation
+type CustomValidator struct {
+	validator *validator.Validate
+}
 
-	config.LoadEnv()
+// Validate method for Echo validation interface
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
+func main() {
+	// Ortam değişkenlerini yükle
+	config.LoadEnv() // .env'den verileri çeksin
 
 	// Veritabanına bağlan
 	database.ConnectDB()
@@ -27,6 +39,9 @@ func main() {
 
 	// Echo başlat
 	e := echo.New()
+
+	// Validator middleware'i kur
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// API dokümantasyonu için Swagger UI endpoint'i
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -37,46 +52,61 @@ func main() {
 	polyclinicNewHandler := handler.NewPolyclinicNewHandler() // Poliklinik yönetimi
 	staffHandler := handler.NewStaffHandler()                 // Personel yönetimi
 
+	// ========== 🌍 AÇIK ERİŞİM ROTALARİ (Middleware Yok) ==========
+
+	// Kimlik doğrulama - herkes erişebilir
 	e.POST("/login", handler.Login)
 	e.POST("/register", handler.Register)
-
-	// Şifre sıfırlama süreçleri
 	e.POST("/reset-password/request", handler.ResetPasswordRequestHandler)
 	e.POST("/reset-password/confirm", handler.ResetPasswordConfirm)
 
-	// ========== HASTANE YÖNETİM ROTALARİ ==========
-	// Yeni hastane kayıt sistemi ve hastane bilgileri
-	e.POST("/hospital/register", hospitalHandler.RegisterHospital) // Hastane kaydı + admin kullanıcı oluşturma
-	e.GET("/hospital/:id", hospitalHandler.GetHospitalByID)        // Hastane detaylarını görüntüleme
+	// Hastane kaydı - herkes erişebilir
+	e.POST("/hospital/register", hospitalHandler.RegisterHospital)
 
-	// ========== COĞRAFİ VERİ ROTALARİ ==========
-	// İl ve ilçe dropdown listeleri için master data
-	e.GET("/provinces", locationHandler.GetAllProvinces)                                 // 81 ili listele
-	e.GET("/provinces/:province_id/districts", locationHandler.GetDistrictsByProvinceID) // Seçili ile ait ilçeleri listele
-
-	// ========== POLİKLİNİK YÖNETİM ROTALARİ ==========
-	// Master data - sistemde tanımlı poliklinik türleri
+	// Master data - herkes erişebilir (dropdown'lar için)
+	e.GET("/provinces", locationHandler.GetAllProvinces)
+	e.GET("/provinces/:province_id/districts", locationHandler.GetDistrictsByProvinceID)
 	e.GET("/polyclinic-types", polyclinicNewHandler.GetPolyclinicTypes)
+	e.GET("/job-groups", staffHandler.GetJobGroups)
+	e.GET("/job-groups/:job_group_id/titles", staffHandler.GetJobTitlesByGroup)
 
-	// Hastane bazlı poliklinik yönetimi (JWT token gerekli)
-	e.POST("/hospital/polyclinics", polyclinicNewHandler.AddPolyclinicToHospital)        // Hastaneye poliklinik ekle
-	e.GET("/hospital/polyclinics", polyclinicNewHandler.GetHospitalPolyclinics)          // Hastanedeki poliklinikleri listele
-	e.PUT("/hospital/polyclinics/:id", polyclinicNewHandler.UpdateHospitalPolyclinic)    // Poliklinik güncelle
-	e.DELETE("/hospital/polyclinics/:id", polyclinicNewHandler.DeleteHospitalPolyclinic) // Poliklinik sil
+	// ========== 🔐 KORUNMUŞ ERİŞİM ROTALARİ (JWT Gerekli) ==========
 
-	// ========== PERSONEL YÖNETİM ROTALARİ ==========
-	// Master data - meslek grupları ve unvanlar
-	e.GET("/job-groups", staffHandler.GetJobGroups)                             // Tüm meslek gruplarını listele (Doktor, Hemşire, vb.)
-	e.GET("/job-groups/:job_group_id/titles", staffHandler.GetJobTitlesByGroup) // Seçilen gruba ait unvanları listele
+	// JWT middleware'i olan grup oluştur
+	protected := e.Group("")
+	protected.Use(utils.JWTAuthMiddleware())
 
-	// Personel CRUD işlemleri (JWT token gerekli)
-	e.POST("/hospital/staff", staffHandler.CreateStaff)       // Yeni personel ekle
-	e.GET("/hospital/staff/:id", staffHandler.GetStaffByID)   // Personel detaylarını görüntüle
-	e.PUT("/hospital/staff/:id", staffHandler.UpdateStaff)    // Personel bilgilerini güncelle
-	e.DELETE("/hospital/staff/:id", staffHandler.DeleteStaff) // Personeli sil
+	// Hastane bilgileri - login olan herkes görebilir
+	protected.GET("/hospital/:id", hospitalHandler.GetHospitalByID)
 
-	// Personel listeleme ve filtreleme (JWT token gerekli)
-	e.POST("/hospital/staff/list", staffHandler.GetStaffList) // Sayfalandırılmış ve filtreli personel listesi
+	// ========== 👀 OKUMA İZNİ GEREKLİ (Hem Yetkili Hem Çalışan) ==========
+
+	// Okuma izni olan grup oluştur
+	readAccess := protected.Group("")
+	readAccess.Use(utils.RequirePermission(utils.READ))
+
+	// Poliklinik görüntüleme - hem yetkili hem çalışan
+	readAccess.GET("/hospital/polyclinics", polyclinicNewHandler.GetHospitalPolyclinics)
+
+	// Personel görüntüleme - hem yetkili hem çalışan
+	readAccess.GET("/hospital/staff/:id", staffHandler.GetStaffByID)
+	readAccess.POST("/hospital/staff/list", staffHandler.GetStaffList) // Filtreleme dahil
+
+	// ========== 🔒 YÖNETİCİ İZNİ GEREKLİ (Sadece Yetkili) ==========
+
+	// Admin izni olan grup oluştur
+	adminAccess := protected.Group("")
+	adminAccess.Use(utils.RequirePermission(utils.ADMIN))
+
+	// Poliklinik yönetimi - sadece yetkili
+	adminAccess.POST("/hospital/polyclinics", polyclinicNewHandler.AddPolyclinicToHospital)
+	adminAccess.PUT("/hospital/polyclinics/:id", polyclinicNewHandler.UpdateHospitalPolyclinic)
+	adminAccess.DELETE("/hospital/polyclinics/:id", polyclinicNewHandler.DeleteHospitalPolyclinic)
+
+	// Personel yönetimi - sadece yetkili
+	adminAccess.POST("/hospital/staff", staffHandler.CreateStaff)
+	adminAccess.PUT("/hospital/staff/:id", staffHandler.UpdateStaff)
+	adminAccess.DELETE("/hospital/staff/:id", staffHandler.DeleteStaff)
 
 	// ========== POLYCLINIC ROUTES (Legacy - Geriye Uyumluluk) ==========
 	// Legacy polyclinic endpoints

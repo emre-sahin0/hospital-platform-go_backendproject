@@ -1,0 +1,97 @@
+# ==================== VERSİYON KONTROL ====================
+.git
+.gitignore
+.gitattributes
+
+# ==================== DOCUMENTATION ====================
+README.md
+*.md
+docs/*.md
+
+# ==================== GO SPECIFIC ====================
+# Binary files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+hospital-platform
+hospital-platform.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+go.work.sum
+
+# ==================== ENVIRONMENT ====================
+.env
+.env.local
+.env.production
+.env.staging
+
+# ==================== IDE & EDITOR ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ==================== OPERATING SYSTEM ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ==================== TEMPORARY FILES ====================
+*.tmp
+*.temp
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# ==================== DEPENDENCIES ====================
+# Dependency directories (handled by go mod)
+vendor/
+
+# ==================== DOCKER ====================
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# ==================== CI/CD ====================
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# ==================== TESTING ====================
+coverage.txt
+*.cover
+test/
+tests/
+*_test.go
+
+# ==================== BUILD ARTIFACTS ====================
+dist/
+build/
+bin/
+
+# ==================== MISC ====================
+node_modules/
+*.tgz
+*.tar.gz 

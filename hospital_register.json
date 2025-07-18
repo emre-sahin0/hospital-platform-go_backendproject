@@ -1,0 +1,15 @@
+﻿{
+  "hospital_name": "VatanSoft Test Hastanesi",
+  "tax_id": "1234567890",
+  "hospital_email": "test@vatansoft.com.tr",
+  "hospital_phone": "02121234567",
+  "province_id": 1,
+  "district_id": 1,
+  "address_detail": "Test Mahallesi, Test Sokak No:1",
+  "admin_first_name": "Admin",
+  "admin_last_name": "Test",
+  "admin_tc": "12345678901",
+  "admin_email": "admin@vatansoft.com.tr",
+  "admin_phone": "05551234567",
+  "admin_password": "Test123!"
+}

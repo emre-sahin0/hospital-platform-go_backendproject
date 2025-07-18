@@ -2,13 +2,11 @@ package model
 
 import "gorm.io/gorm"
 
-// User role constants
 const (
 	RoleYetkili = "yetkili" // Yetkililer - tüm işlemleri yapabilir
 	RoleCalisan = "çalışan" // Çalışanlar - sadece görüntüleme
 )
 
-// User represents a hospital user
 // @Description Hastane kullanıcı bilgileri
 type User struct {
 	gorm.Model `swaggerignore:"true"`

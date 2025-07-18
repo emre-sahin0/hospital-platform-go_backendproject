@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Bu API VatanSoft staj giriş projesi için yazılmıştır.",
+        "description": "Bu API VatanSoft staj projesi için yazılmıştır.",
         "title": "Hastane Takip API",
         "contact": {},
         "version": "1.0"

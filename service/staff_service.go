@@ -12,14 +12,16 @@ import (
 type StaffService struct {
 	staffRepo      *repository.StaffRepository      // Personel veritabanı işlemleri
 	polyclinicRepo *repository.PolyclinicRepository // Poliklinik doğrulama işlemleri
+	cacheService   *CacheService                    // Master data cache işlemleri
 }
 
 // NewStaffService - Bağımlılıkları enjekte ederek yeni servis instance'ı oluşturur
-// Repository'leri initialize eder ve hazır hale getirir
+// Repository'leri ve cache service'i initialize eder
 func NewStaffService() *StaffService {
 	return &StaffService{
 		staffRepo:      repository.NewStaffRepository(),
 		polyclinicRepo: repository.NewPolyclinicRepository(),
+		cacheService:   NewCacheService(),
 	}
 }
 
@@ -148,16 +150,18 @@ func (s *StaffService) GetStaffList(req *model.StaffListRequest, hospitalID uint
 	return s.staffRepo.GetPaginatedStaff(hospitalID, req)
 }
 
-// ==================== MASTER DATA ====================
+// ==================== MASTER DATA (CACHE'LI) ====================
 
-// GetJobGroups meslek gruplarını getirir
+// GetJobGroups - Meslek gruplarını cache'den getirir
+// Cache miss durumunda database'den yükler ve cache'e kaydeder
 func (s *StaffService) GetJobGroups() ([]model.JobGroup, error) {
-	return s.staffRepo.GetJobGroups()
+	return s.cacheService.GetJobGroups()
 }
 
-// GetJobTitlesByGroup meslek grubuna göre unvanları getirir
+// GetJobTitlesByGroup - Meslek grubuna göre unvanları cache'den getirir
+// Cache miss durumunda database'den yükler ve cache'e kaydeder
 func (s *StaffService) GetJobTitlesByGroup(jobGroupID uint) ([]model.JobTitle, error) {
-	return s.staffRepo.GetJobTitlesByGroup(jobGroupID)
+	return s.cacheService.GetJobTitlesByGroupID(jobGroupID)
 }
 
 // ==================== VALİDASYON METHODS ====================

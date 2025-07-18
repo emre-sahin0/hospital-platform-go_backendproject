@@ -7,7 +7,6 @@ import (
 	"hospital-platform/model"
 	"hospital-platform/repository"
 	"hospital-platform/utils"
-	"strconv"
 )
 
 // Kayıt servisi — user şifresi hashlenir, veritabanına gönderilir
@@ -61,8 +60,8 @@ func Login(email, password string) (string, error) {
 		return "", errors.New("Şifre yanlış")
 	}
 
-	// JWT token üret
-	token, err := utils.GenerateJWT(user.ID, user.Role, strconv.FormatUint(uint64(user.HospitalID), 10))
+	// JWT token üret (doğru parametreler ile)
+	token, err := utils.GenerateJWT(user.ID, user.Email, user.Role, user.HospitalID, user.Email)
 	if err != nil {
 		fmt.Println("Token üretme hatası:", err)
 		return "", err

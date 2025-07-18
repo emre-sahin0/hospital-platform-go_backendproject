@@ -667,7 +667,7 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: Bu API VatanSoft staj giriş projesi için yazılmıştır.
+  description: Bu API VatanSoft staj projesi için yazılmıştır.
   title: Hastane Takip API
   version: "1.0"
 paths:

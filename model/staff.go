@@ -2,7 +2,6 @@ package model
 
 import "gorm.io/gorm"
 
-// Staff represents hospital personnel
 // @Description Hastane personel bilgileri
 type Staff struct {
 	gorm.Model   `swaggerignore:"true"`

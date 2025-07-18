@@ -91,8 +91,9 @@ func (s *HospitalService) RegisterHospital(req *model.HospitalRegistrationReques
 		return nil, nil, fmt.Errorf("transaction commit edilemedi: %v", err)
 	}
 
-	// 7. JWT token oluştur
-	token, err := utils.GenerateJWT(adminUser.ID, adminUser.Email, adminUser.Role)
+	// 7. JWT token oluştur (hospital_id ve username dahil)
+	// Email'i username olarak kullan
+	token, err := utils.GenerateJWT(adminUser.ID, adminUser.Email, adminUser.Role, adminUser.HospitalID, adminUser.Email)
 	if err != nil {
 		return nil, nil, fmt.Errorf("token oluşturulamadı: %v", err)
 	}

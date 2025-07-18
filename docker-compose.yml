@@ -1,0 +1,132 @@
+services:
+  # ==================== POSTGRESQL VERİTABANI ====================
+  postgres:
+    image: postgres:15-alpine
+    container_name: hospital-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hospital_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d # İlk kurulum SQL'leri
+    networks:
+      - hospital-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== REDİS CACHE ====================
+  redis:
+    image: redis:7-alpine
+    container_name: hospital-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hospital-network
+    command: redis-server --appendonly yes --requirepass ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==================== GO UYGULAMASI ====================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hospital-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Database bağlantı ayarları
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: hospital_platform
+      DB_SSLMODE: disable
+      
+      # Redis bağlantı ayarları
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      
+      # JWT ayarları
+      JWT_SECRET: "super_secret_jwt_key_for_hospital_platform_2024"
+      
+      # Uygulama ayarları
+      APP_ENV: production
+      APP_PORT: 8080
+      
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - hospital-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/swagger/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==================== VERİTABANI YÖNETİM ARAÇLARI (Opsiyonel) ====================
+  adminer:
+    image: adminer:latest
+    container_name: hospital-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      - postgres
+    networks:
+      - hospital-network
+    profiles:
+      - tools # docker-compose --profile tools up ile çalıştır
+
+  # ==================== REDİS YÖNETİM ARAÇLARI (Opsiyonel) ====================
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: hospital-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      REDIS_HOSTS: redis
+    depends_on:
+      - redis
+    networks:
+      - hospital-network
+    profiles:
+      - tools # docker-compose --profile tools up ile çalıştır
+
+# ==================== VOLUMES ====================
+volumes:
+  postgres_data:
+    driver: local
+    name: hospital_postgres_data
+  redis_data:
+    driver: local
+    name: hospital_redis_data
+
+# ==================== NETWORKS ====================
+networks:
+  hospital-network:
+    driver: bridge
+    name: hospital-network 

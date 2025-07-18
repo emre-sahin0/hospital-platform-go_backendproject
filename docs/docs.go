@@ -1995,7 +1995,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Hastane Takip API",
-	Description:      "Bu API VatanSoft staj giriş projesi için yazılmıştır.",
+	Description:      "Bu API VatanSoft staj projesi için yazılmıştır.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

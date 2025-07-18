@@ -6,23 +6,28 @@ import (
 	"hospital-platform/repository"
 )
 
-// PolyclinicService poliklinik iş mantığını yönetir
+// PolyclinicService - Poliklinik iş mantığını yöneten servis
+// Cache service ile performanslı master data erişimi sağlar
 type PolyclinicService struct {
-	polyclinicRepo *repository.PolyclinicRepository
-	locationRepo   *repository.LocationRepository
+	polyclinicRepo *repository.PolyclinicRepository // Poliklinik veritabanı işlemleri
+	locationRepo   *repository.LocationRepository   // Lokasyon doğrulama işlemleri
+	cacheService   *CacheService                    // Master data cache işlemleri
 }
 
-// NewPolyclinicService yeni bir poliklinik servisi oluşturur
+// NewPolyclinicService - Yeni bir poliklinik servisi oluşturur
+// Repository'leri ve cache service'i initialize eder
 func NewPolyclinicService() *PolyclinicService {
 	return &PolyclinicService{
 		polyclinicRepo: repository.NewPolyclinicRepository(),
 		locationRepo:   repository.NewLocationRepository(),
+		cacheService:   NewCacheService(),
 	}
 }
 
-// GetAllPolyclinicTypes master data poliklinik türlerini getirir
+// GetAllPolyclinicTypes - Master data poliklinik türlerini cache'den getirir
+// Cache miss durumunda database'den yükler ve cache'e kaydeder
 func (s *PolyclinicService) GetAllPolyclinicTypes() ([]model.PolyclinicType, error) {
-	return s.polyclinicRepo.GetAllPolyclinicTypes()
+	return s.cacheService.GetPolyclinicTypes()
 }
 
 // AddPolyclinicToHospital hastaneye yeni poliklinik ekler
