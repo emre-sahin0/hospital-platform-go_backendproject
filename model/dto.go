@@ -154,3 +154,28 @@ type PaginationInfo struct {
 	HasNext      bool  `json:"has_next" example:"true"`    // Sonraki sayfa var mı?
 	HasPrev      bool  `json:"has_prev" example:"false"`   // Önceki sayfa var mı?
 }
+
+// ==================== ALT KULLANICI DTO'ları ====================
+
+// CreateSubUserRequest represents creating sub user request
+// @Description Alt kullanıcı ekleme verisi
+type CreateSubUserRequest struct {
+	FirstName string `json:"first_name" example:"Mehmet" binding:"required"`                     // Ad
+	LastName  string `json:"last_name" example:"Yılmaz" binding:"required"`                      // Soyad
+	TCKN      string `json:"tc" example:"12345678901" binding:"required"`                        // TC Kimlik No
+	Email     string `json:"email" example:"mehmet.yilmaz@example.com" binding:"required,email"` // E-posta
+	Phone     string `json:"phone" example:"05551234567" binding:"required"`                     // Telefon
+	Password  string `json:"password" example:"123456" binding:"required,min=6"`                 // Şifre
+	Role      string `json:"role" example:"çalışan" binding:"required,oneof=yetkili çalışan"`    // Rol
+}
+
+// UpdateSubUserRequest represents updating sub user request
+// @Description Alt kullanıcı güncelleme verisi
+type UpdateSubUserRequest struct {
+	FirstName string `json:"first_name" example:"Ahmet" binding:"required"`                    // Ad
+	LastName  string `json:"last_name" example:"Özkan" binding:"required"`                     // Soyad
+	Email     string `json:"email" example:"ahmet.ozkan@example.com" binding:"required,email"` // E-posta
+	Phone     string `json:"phone" example:"05559876543" binding:"required"`                   // Telefon
+	Role      string `json:"role" example:"yetkili" binding:"required,oneof=yetkili çalışan"`  // Rol
+	IsActive  bool   `json:"is_active" example:"true"`                                         // Aktif mi?
+}

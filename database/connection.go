@@ -31,9 +31,14 @@ func ConnectDB() {
 
 	fmt.Println("Veritabanı bağlantısı başarılı!")
 
-	// Migration yapmadan önce problemli tabloları temizle
-	fmt.Println("Mevcut tabloları temizleniyor...")
-	dropTables()
+	// Sadece development ortamında tabloları temizle
+	appEnv := config.GetEnv("APP_ENV", "development")
+	if appEnv == "development" {
+		fmt.Println("Development ortamı - Mevcut tabloları temizleniyor...")
+		dropTables()
+	} else {
+		fmt.Println("Production ortamı - Tablolar korunuyor...")
+	}
 
 	// Run migrations for all models
 	err = DB.AutoMigrate(

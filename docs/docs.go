@@ -543,6 +543,213 @@ const docTemplate = `{
                 }
             }
         },
+        "/hospital/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hastaneye ait alt kullanıcıları listeler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Alt kullanıcıları listele",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Yetkili kullanıcı tarafından alt kullanıcı eklenir",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Alt kullanıcı ekle",
+                "parameters": [
+                    {
+                        "description": "Alt kullanıcı bilgileri",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateSubUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/hospital/users/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Yetkili kullanıcı tarafından alt kullanıcı güncellenir",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Alt kullanıcı güncelle",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Kullanıcı ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Güncelleme verisi",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateSubUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Yetkili kullanıcı tarafından alt kullanıcı silinir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Management"
+                ],
+                "summary": "Alt kullanıcı sil",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Kullanıcı ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/hospital/{id}": {
             "get": {
                 "description": "ID'ye göre hastane bilgilerini getirir",
@@ -664,7 +871,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "Email ve şifre ile kullanıcı girişi yapılır",
+                "description": "Email veya telefon numarası ve şifre ile kullanıcı girişi yapılır",
                 "consumes": [
                     "application/json"
                 ],
@@ -1127,6 +1334,61 @@ const docTemplate = `{
         "model.CreateStaffRequest": {
             "type": "object"
         },
+        "model.CreateSubUserRequest": {
+            "description": "Alt kullanıcı ekleme verisi",
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "password",
+                "phone",
+                "role",
+                "tc"
+            ],
+            "properties": {
+                "email": {
+                    "description": "E-posta",
+                    "type": "string",
+                    "example": "mehmet.yilmaz@example.com"
+                },
+                "first_name": {
+                    "description": "Ad",
+                    "type": "string",
+                    "example": "Mehmet"
+                },
+                "last_name": {
+                    "description": "Soyad",
+                    "type": "string",
+                    "example": "Yılmaz"
+                },
+                "password": {
+                    "description": "Şifre",
+                    "type": "string",
+                    "minLength": 6,
+                    "example": "123456"
+                },
+                "phone": {
+                    "description": "Telefon",
+                    "type": "string",
+                    "example": "05551234567"
+                },
+                "role": {
+                    "description": "Rol",
+                    "type": "string",
+                    "enum": [
+                        "yetkili",
+                        "çalışan"
+                    ],
+                    "example": "çalışan"
+                },
+                "tc": {
+                    "description": "TC Kimlik No",
+                    "type": "string",
+                    "example": "12345678901"
+                }
+            }
+        },
         "model.District": {
             "description": "İlçe bilgileri",
             "type": "object",
@@ -1473,15 +1735,15 @@ const docTemplate = `{
             }
         },
         "model.LoginRequest": {
-            "description": "Kullanıcı giriş bilgileri",
+            "description": "Kullanıcı giriş bilgileri (email veya telefon ile)",
             "type": "object",
             "required": [
-                "email",
+                "email_or_phone",
                 "password"
             ],
             "properties": {
-                "email": {
-                    "description": "E-posta adresi",
+                "email_or_phone": {
+                    "description": "E-posta adresi veya telefon numarası",
                     "type": "string",
                     "example": "ahmet.yilmaz@example.com"
                 },
@@ -1898,6 +2160,53 @@ const docTemplate = `{
         "model.UpdateStaffRequest": {
             "type": "object"
         },
+        "model.UpdateSubUserRequest": {
+            "description": "Alt kullanıcı güncelleme verisi",
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "phone",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "description": "E-posta",
+                    "type": "string",
+                    "example": "ahmet.ozkan@example.com"
+                },
+                "first_name": {
+                    "description": "Ad",
+                    "type": "string",
+                    "example": "Ahmet"
+                },
+                "is_active": {
+                    "description": "Aktif mi?",
+                    "type": "boolean",
+                    "example": true
+                },
+                "last_name": {
+                    "description": "Soyad",
+                    "type": "string",
+                    "example": "Özkan"
+                },
+                "phone": {
+                    "description": "Telefon",
+                    "type": "string",
+                    "example": "05559876543"
+                },
+                "role": {
+                    "description": "Rol",
+                    "type": "string",
+                    "enum": [
+                        "yetkili",
+                        "çalışan"
+                    ],
+                    "example": "yetkili"
+                }
+            }
+        },
         "model.User": {
             "description": "Hastane kullanıcı bilgileri",
             "type": "object",
@@ -1984,6 +2293,14 @@ const docTemplate = `{
                     "example": "12345678901"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT token için \"Bearer \" prefix'i ile birlikte token'ı girin. Örnek: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

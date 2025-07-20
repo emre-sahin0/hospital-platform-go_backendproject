@@ -3,6 +3,10 @@
 // @description Bu API VatanSoft staj projesi için yazılmıştır.
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description JWT token için "Bearer " prefix'i ile birlikte token'ı girin. Örnek: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 package main
 
@@ -107,6 +111,12 @@ func main() {
 	adminAccess.POST("/hospital/staff", staffHandler.CreateStaff)
 	adminAccess.PUT("/hospital/staff/:id", staffHandler.UpdateStaff)
 	adminAccess.DELETE("/hospital/staff/:id", staffHandler.DeleteStaff)
+
+	// Alt kullanıcı yönetimi - sadece yetkili
+	adminAccess.POST("/hospital/users", handler.CreateSubUser)
+	adminAccess.GET("/hospital/users", handler.GetSubUsers)
+	adminAccess.PUT("/hospital/users/:id", handler.UpdateSubUser)
+	adminAccess.DELETE("/hospital/users/:id", handler.DeleteSubUser)
 
 	// ========== POLYCLINIC ROUTES (Legacy - Geriye Uyumluluk) ==========
 	// Legacy polyclinic endpoints

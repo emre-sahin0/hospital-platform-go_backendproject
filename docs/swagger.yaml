@@ -22,6 +22,50 @@ definitions:
     type: object
   model.CreateStaffRequest:
     type: object
+  model.CreateSubUserRequest:
+    description: Alt kullanıcı ekleme verisi
+    properties:
+      email:
+        description: E-posta
+        example: mehmet.yilmaz@example.com
+        type: string
+      first_name:
+        description: Ad
+        example: Mehmet
+        type: string
+      last_name:
+        description: Soyad
+        example: Yılmaz
+        type: string
+      password:
+        description: Şifre
+        example: "123456"
+        minLength: 6
+        type: string
+      phone:
+        description: Telefon
+        example: "05551234567"
+        type: string
+      role:
+        description: Rol
+        enum:
+        - yetkili
+        - çalışan
+        example: çalışan
+        type: string
+      tc:
+        description: TC Kimlik No
+        example: "12345678901"
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - phone
+    - role
+    - tc
+    type: object
   model.District:
     description: İlçe bilgileri
     properties:
@@ -276,10 +320,10 @@ definitions:
     - name
     type: object
   model.LoginRequest:
-    description: Kullanıcı giriş bilgileri
+    description: Kullanıcı giriş bilgileri (email veya telefon ile)
     properties:
-      email:
-        description: E-posta adresi
+      email_or_phone:
+        description: E-posta adresi veya telefon numarası
         example: ahmet.yilmaz@example.com
         type: string
       password:
@@ -288,7 +332,7 @@ definitions:
         minLength: 6
         type: string
     required:
-    - email
+    - email_or_phone
     - password
     type: object
   model.PaginationInfo:
@@ -598,6 +642,43 @@ definitions:
     - room_number
     type: object
   model.UpdateStaffRequest:
+    type: object
+  model.UpdateSubUserRequest:
+    description: Alt kullanıcı güncelleme verisi
+    properties:
+      email:
+        description: E-posta
+        example: ahmet.ozkan@example.com
+        type: string
+      first_name:
+        description: Ad
+        example: Ahmet
+        type: string
+      is_active:
+        description: Aktif mi?
+        example: true
+        type: boolean
+      last_name:
+        description: Soyad
+        example: Özkan
+        type: string
+      phone:
+        description: Telefon
+        example: "05559876543"
+        type: string
+      role:
+        description: Rol
+        enum:
+        - yetkili
+        - çalışan
+        example: yetkili
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - phone
+    - role
     type: object
   model.User:
     description: Hastane kullanıcı bilgileri
@@ -1045,6 +1126,141 @@ paths:
       summary: Personel listesi
       tags:
       - Staff
+  /hospital/users:
+    get:
+      description: Hastaneye ait alt kullanıcıları listeler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Alt kullanıcıları listele
+      tags:
+      - User Management
+    post:
+      consumes:
+      - application/json
+      description: Yetkili kullanıcı tarafından alt kullanıcı eklenir
+      parameters:
+      - description: Alt kullanıcı bilgileri
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateSubUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Alt kullanıcı ekle
+      tags:
+      - User Management
+  /hospital/users/{id}:
+    delete:
+      description: Yetkili kullanıcı tarafından alt kullanıcı silinir
+      parameters:
+      - description: Kullanıcı ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Alt kullanıcı sil
+      tags:
+      - User Management
+    put:
+      consumes:
+      - application/json
+      description: Yetkili kullanıcı tarafından alt kullanıcı güncellenir
+      parameters:
+      - description: Kullanıcı ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Güncelleme verisi
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateSubUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "422":
+          description: Unprocessable Entity
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Alt kullanıcı güncelle
+      tags:
+      - User Management
   /job-groups:
     get:
       description: Tüm meslek gruplarını getirir
@@ -1100,7 +1316,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Email ve şifre ile kullanıcı girişi yapılır
+      description: Email veya telefon numarası ve şifre ile kullanıcı girişi yapılır
       parameters:
       - description: Giriş bilgileri
         in: body
@@ -1387,4 +1603,11 @@ paths:
       summary: Şifre sıfırlama kodu gönder
       tags:
       - Auth
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT token için "Bearer " prefix''i ile birlikte token''ı girin.
+      Örnek: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

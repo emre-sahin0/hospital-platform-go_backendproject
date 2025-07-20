@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"hospital-platform/database"
 	"hospital-platform/model"
 	"hospital-platform/repository"
 	"hospital-platform/utils"
@@ -24,7 +23,7 @@ func NewHospitalService() *HospitalService {
 	}
 }
 
-// RegisterHospital yeni hastane ve admin kullanıcı kaydı yapar
+// RegisterHospital hastane ve admin kullanıcı kaydı yapar
 func (s *HospitalService) RegisterHospital(req *model.HospitalRegistrationRequest) (*model.HospitalRegistrationResponse, []model.ValidationError, error) {
 	// 1. Giriş verilerini doğrula
 	validationErrors := s.validateRegistrationData(req)
@@ -32,81 +31,16 @@ func (s *HospitalService) RegisterHospital(req *model.HospitalRegistrationReques
 		return nil, validationErrors, nil
 	}
 
-	// 2. Veritabanı transaction'ını başlat
-	tx := database.DB.Begin()
-	if tx.Error != nil {
-		return nil, nil, fmt.Errorf("transaction başlatılamadı: %v", tx.Error)
-	}
-
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	// 3. Hastaneyi oluştur
-	hospital := &model.Hospital{
-		Name:          req.HospitalName,
-		TaxID:         req.TaxID,
-		Email:         req.HospitalEmail,
-		Phone:         req.HospitalPhone,
-		ProvinceID:    req.ProvinceID,
-		DistrictID:    req.DistrictID,
-		AddressDetail: req.AddressDetail,
-	}
-
-	if err := tx.Create(hospital).Error; err != nil {
-		tx.Rollback()
-		return nil, nil, fmt.Errorf("hastane oluşturulamadı: %v", err)
-	}
-
-	// 4. Admin şifresini hash'le
+	// 2. Admin şifresini hash'le
 	hashedPassword, err := utils.HashPassword(req.AdminPassword)
 	if err != nil {
-		tx.Rollback()
 		return nil, nil, fmt.Errorf("şifre hash'lenemedi: %v", err)
 	}
 
-	// 5. Admin kullanıcıyı oluştur
-	adminUser := &model.User{
-		HospitalID: hospital.ID,
-		FirstName:  req.AdminFirstName,
-		LastName:   req.AdminLastName,
-		TCKN:       req.AdminTCKN,
-		Email:      req.AdminEmail,
-		Phone:      req.AdminPhone,
-		Password:   hashedPassword,
-		Role:       model.RoleYetkili, // İlk kullanıcı yetkili
-		CreatedBy:  nil,               // İlk kullanıcı için nil
-		IsActive:   true,
-	}
-
-	if err := tx.Create(adminUser).Error; err != nil {
-		tx.Rollback()
-		return nil, nil, fmt.Errorf("admin kullanıcı oluşturulamadı: %v", err)
-	}
-
-	// 6. Transaction'ı commit et
-	if err := tx.Commit().Error; err != nil {
-		return nil, nil, fmt.Errorf("transaction commit edilemedi: %v", err)
-	}
-
-	// 7. JWT token oluştur (hospital_id ve username dahil)
-	// Email'i username olarak kullan
-	token, err := utils.GenerateJWT(adminUser.ID, adminUser.Email, adminUser.Role, adminUser.HospitalID, adminUser.Email)
+	// 3. Hastane ve admin kullanıcıyı oluştur (Repository üzerinden)
+	response, err := s.hospitalRepo.CreateHospitalWithAdmin(req, hashedPassword)
 	if err != nil {
-		return nil, nil, fmt.Errorf("token oluşturulamadı: %v", err)
-	}
-
-	// 8. Response için ilişkileri yükle
-	hospital, _ = s.hospitalRepo.GetByID(hospital.ID)
-	adminUser.Password = "" // Şifreyi response'dan kaldır
-
-	response := &model.HospitalRegistrationResponse{
-		Message:   "Hastane ve admin kullanıcı başarıyla oluşturuldu",
-		Hospital:  *hospital,
-		AdminUser: *adminUser,
-		Token:     token,
+		return nil, nil, fmt.Errorf("hastane kaydı başarısız: %v", err)
 	}
 
 	return response, nil, nil

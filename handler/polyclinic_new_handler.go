@@ -219,22 +219,11 @@ func (h *PolyclinicNewHandler) DeleteHospitalPolyclinic(c echo.Context) error {
 
 // getHospitalIDFromToken JWT token'dan hospital ID'yi çıkarır
 func (h *PolyclinicNewHandler) getHospitalIDFromToken(c echo.Context) (uint, error) {
-	// Authorization header'dan token al
-	authHeader := c.Request().Header.Get("Authorization")
-	if authHeader == "" {
-		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Authorization header eksik")
+	// Middleware tarafından context'e yerleştirilen hospital_id'yi al
+	hospitalID, ok := utils.GetHospitalIDFromContext(c)
+	if !ok {
+		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Hospital ID bulunamadı - token geçersiz")
 	}
 
-	// "Bearer " prefix'ini kaldır
-	tokenString := authHeader[7:] // "Bearer " 7 karakter
-
-	// Token'ı doğrula
-	_, err := utils.ValidateJWT(tokenString)
-	if err != nil {
-		return 0, echo.NewHTTPError(http.StatusUnauthorized, "Geçersiz token")
-	}
-
-	// TODO: User ID'den Hospital ID'yi çek
-	// Şimdilik basit implementation - gerçekte user service'den çekilmeli
-	return 1, nil // Geçici olarak 1 döndürüyoruz
+	return hospitalID, nil
 }
