@@ -133,6 +133,39 @@ PolyclinicType 1:N HospitalPolyclinics (Bir tip birden fazla hastanede)
 
 ## 🚀 **API Endpoint'leri**
 
+### **⚙️ Environment Variables**
+
+Proje aşağıdaki environment variables'ları kullanır. `.env` dosyasında tanımlanabilir:
+
+```bash
+# ==================== DATABASE SETTINGS ====================
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=Admin..200101
+DB_NAME=hospital_db
+DB_SSLMODE=disable
+
+# ==================== REDIS SETTINGS ====================
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# ==================== JWT SETTINGS ====================
+JWT_SECRET=super_secret_jwt_key_for_hospital_platform_2024
+
+# ==================== APPLICATION SETTINGS ====================
+APP_ENV=development
+APP_PORT=8080
+```
+
+**Docker Ortamı için:**
+```bash
+DB_HOST=postgres
+REDIS_HOST=redis
+APP_ENV=production
+```
+
 ### **🔐 Kimlik Doğrulama**
 ```http
 POST /login                           # Kullanıcı girişi
@@ -145,6 +178,7 @@ POST /reset-password/confirm          # Şifre sıfırlama onayı
 ```http
 POST /hospital/register               # Yeni hastane kaydı + admin oluşturma
 GET  /hospital/:id                    # Hastane detayları
+GET  /health                          # Health check endpoint
 ```
 
 ### **📍 Coğrafi Veriler**
@@ -157,7 +191,7 @@ GET /provinces/:id/districts          # İle ait ilçeleri listele
 ```http
 GET    /polyclinic-types              # Master poliklinik türleri
 POST   /hospital/polyclinics  🔒      # Hastaneye poliklinik ekle
-GET    /hospital/polyclinics  🔒      # Hastane polikliniklerini listele
+GET    /hospital/polyclinics  🔒      # Hastane polikliniklerini listele (personel sayılarıyla)
 PUT    /hospital/polyclinics/:id  🔒  # Poliklinik güncelle
 DELETE /hospital/polyclinics/:id  🔒  # Poliklinik sil
 ```

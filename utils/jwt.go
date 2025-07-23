@@ -1,12 +1,17 @@
 package utils
 
 import (
+	"hospital-platform/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var JWTSecret = []byte("supersecretkey") // Production'da config'den alınmalı
+// getJWTSecret JWT secret'ını environment variable'dan al
+func getJWTSecret() []byte {
+	secret := config.GetEnv("JWT_SECRET", "super_secret_jwt_key_for_hospital_platform_2024")
+	return []byte(secret)
+}
 
 type Claims struct {
 	UserID     uint   `json:"user_id"`
@@ -35,7 +40,7 @@ func GenerateJWT(userID uint, email, role string, hospitalID uint, username stri
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(JWTSecret)
+	return token.SignedString(getJWTSecret())
 }
 
 // ValidateJWT - JWT token'ını doğrular ve claims'leri map olarak döndürür
@@ -44,7 +49,7 @@ func ValidateJWT(tokenString string) (map[string]interface{}, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return JWTSecret, nil
+		return getJWTSecret(), nil
 	})
 
 	if err != nil {
@@ -73,7 +78,7 @@ func ValidateJWTWithClaims(tokenString string) (*Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return JWTSecret, nil
+		return getJWTSecret(), nil
 	})
 
 	if err != nil {

@@ -754,6 +754,8 @@ info:
 paths:
   /hospital/{id}:
     get:
+      consumes:
+      - application/json
       description: ID'ye göre hastane bilgilerini getirir
       parameters:
       - description: Hastane ID
@@ -773,11 +775,18 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Hastane bilgilerini getir
       tags:
       - Hospital

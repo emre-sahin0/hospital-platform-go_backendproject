@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -31,7 +32,10 @@ func JWTAuthMiddleware() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			// Authorization header'ını kontrol et
 			authHeader := c.Request().Header.Get("Authorization")
+			fmt.Printf("🔍 AUTH DEBUG: Header = '%s'\n", authHeader)
+
 			if authHeader == "" {
+				fmt.Println("❌ AUTH: Header eksik")
 				return c.JSON(http.StatusUnauthorized, echo.Map{
 					"error":   "Yetkilendirme hatası",
 					"message": "Authorization header eksik",
@@ -40,6 +44,7 @@ func JWTAuthMiddleware() echo.MiddlewareFunc {
 
 			// "Bearer " prefix'ini kontrol et
 			if !strings.HasPrefix(authHeader, "Bearer ") {
+				fmt.Printf("❌ AUTH: Bearer prefix eksik, gelen: '%s'\n", authHeader)
 				return c.JSON(http.StatusUnauthorized, echo.Map{
 					"error":   "Yetkilendirme hatası",
 					"message": "Geçersiz token formatı",
@@ -48,10 +53,12 @@ func JWTAuthMiddleware() echo.MiddlewareFunc {
 
 			// Token'ı çıkar
 			tokenString := authHeader[7:] // "Bearer " kısmını kes
+			fmt.Printf("🔍 AUTH: Token = '%s'\n", tokenString[:20]+"...")
 
 			// Token'ı doğrula ve parse et
 			claims, err := ValidateJWT(tokenString)
 			if err != nil {
+				fmt.Printf("❌ AUTH: Token validation error: %v\n", err)
 				return c.JSON(http.StatusUnauthorized, echo.Map{
 					"error":   "Yetkilendirme hatası",
 					"message": "Geçersiz veya süresi dolmuş token",
@@ -63,6 +70,8 @@ func JWTAuthMiddleware() echo.MiddlewareFunc {
 			c.Set("hospital_id", claims["hospital_id"])
 			c.Set("role", claims["role"])
 			c.Set("username", claims["username"])
+
+			fmt.Printf("✅ AUTH: Başarılı - Hospital ID: %v, User ID: %v\n", claims["hospital_id"], claims["user_id"])
 
 			return next(c)
 		}
@@ -197,16 +206,29 @@ func GetUserIDFromContext(c echo.Context) (uint, bool) {
 // GetHospitalIDFromContext - Context'ten hospital ID'yi çıkarır
 func GetHospitalIDFromContext(c echo.Context) (uint, bool) {
 	hospitalIDInterface := c.Get("hospital_id")
+	fmt.Printf("🔍 CONTEXT DEBUG: hospital_id = %+v (type: %T)\n", hospitalIDInterface, hospitalIDInterface)
+
 	if hospitalIDInterface == nil {
+		fmt.Println("❌ CONTEXT: hospital_id nil")
 		return 0, false
 	}
 
 	// interface{} to float64 (JWT'den gelen sayılar float64 olur)
 	hospitalIDFloat, ok := hospitalIDInterface.(float64)
 	if !ok {
+		fmt.Printf("❌ CONTEXT: Type conversion failed. Value: %+v, Type: %T\n", hospitalIDInterface, hospitalIDInterface)
+
+		// uint olarak da deneyelim
+		if hospitalIDUint, okUint := hospitalIDInterface.(uint); okUint {
+			fmt.Printf("✅ CONTEXT: uint conversion success: %d\n", hospitalIDUint)
+			return hospitalIDUint, true
+		}
+
+		// float64 conversion failed, try other types
 		return 0, false
 	}
 
+	fmt.Printf("✅ CONTEXT: float64 conversion success: %f -> %d\n", hospitalIDFloat, uint(hospitalIDFloat))
 	return uint(hospitalIDFloat), true
 }
 

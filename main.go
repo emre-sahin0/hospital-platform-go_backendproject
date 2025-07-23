@@ -18,6 +18,9 @@ import (
 
 	_ "hospital-platform/docs" // Swagger docs
 
+	"net/http"
+	"time"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -49,6 +52,15 @@ func main() {
 
 	// API dokümantasyonu için Swagger UI endpoint'i
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	// Health check endpoint - Docker için
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, echo.Map{
+			"status":    "healthy",
+			"service":   "hospital-platform",
+			"timestamp": time.Now().Format(time.RFC3339),
+		})
+	})
 
 	// Tüm handler'ları initialize et - dependency injection
 	hospitalHandler := handler.NewHospitalHandler()           // Hastane yönetimi

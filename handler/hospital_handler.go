@@ -79,10 +79,13 @@ func (h *HospitalHandler) RegisterHospital(c echo.Context) error {
 // @Summary Hastane bilgilerini getir
 // @Description ID'ye göre hastane bilgilerini getirir
 // @Tags Hospital
+// @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Hastane ID"
 // @Success 200 {object} model.Hospital
 // @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /hospital/{id} [get]
 func (h *HospitalHandler) GetHospitalByID(c echo.Context) error {
