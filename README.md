@@ -489,44 +489,6 @@ curl -X POST http://localhost:8080/hospital/staff/list \
 
 ---
 
-## 🚀 **Gelecek Planları**
-
-### **⏳ Yakın Dönem (1-2 Hafta)**
-- [ ] **Authorization Middleware**: Role-based erişim kontrolü
-- [ ] **Redis Cache Implementation**: Master data cache'leme
-- [ ] **Docker Compose**: Tüm servisler için container'lama
-- [ ] **Unit Tests**: Temel fonksiyonlar için test yazma
-
-### **🎯 Orta Dönem (1-2 Ay)**
-- [ ] **Appointment System**: Randevu yönetimi
-- [ ] **Patient Management**: Hasta kayıt sistemi
-- [ ] **Medical Records**: Tıbbi kayıt yönetimi
-- [ ] **Reporting Dashboard**: Analitik ve raporlar
-
-### **🔮 Uzun Dönem (3-6 Ay)**
-- [ ] **Mobile App**: React Native mobil uygulama
-- [ ] **Notification System**: Real-time bildirimler
-- [ ] **Integration APIs**: Harici sistem entegrasyonları
-- [ ] **Advanced Analytics**: Makine öğrenmesi ile analitik
-
----
-
-## 👥 **Katkıda Bulunanlar**
-
-- **Geliştirici**: [Emre S.] - Full Stack Development
-- **Mentor**: [VatanSoft Team] - Code Review & Guidance
-- **Tester**: [QA Team] - Test & Quality Assurance
-
----
-
-## 📞 **İletişim**
-
-- **Email**: info@vatansoft.com
-- **Website**: https://vatansoft.com
-- **GitHub**: https://github.com/vatansoft/hospital-platform
-- **Documentation**: http://localhost:8080/swagger/
-
----
 
 ## 📝 **Lisans**
 
